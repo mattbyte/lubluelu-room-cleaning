@@ -1,0 +1,8 @@
+{
+  "name": "Lubluelu Room Cleaning",
+  "build": {"dockerfile": "Dockerfile", "context": ".."},
+  "customizations": {
+    "vscode": {"extensions": ["ms-python.python", "charliermarsh.ruff"]}
+  },
+  "forwardPorts": [8123]
+}

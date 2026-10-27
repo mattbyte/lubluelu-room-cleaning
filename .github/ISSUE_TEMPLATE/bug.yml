@@ -1,0 +1,21 @@
+name: Bug report
+description: Report a reproducible integration problem without secrets.
+body:
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions and device model
+      description: Include Home Assistant, Tuya Local, this integration, and the vacuum model. Never include device IDs, local keys, tokens, or credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps, expected result, and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Companion integration diagnostics
+      description: Attach only diagnostics downloaded from Lubluelu Room Cleaning. Review logs before sharing; source integration logs may contain private data.
