@@ -48,7 +48,7 @@ Room IDs belong to your robot's current map. Never copy another user's Kitchen o
 ## Use native Home Assistant areas
 
 1. Open the **Room cleaning** companion vacuum's entity settings.
-2. Open Home Assistant's built-in **area mapping** and associate the learned robot rooms with your HA areas.
+2. Open **Map vacuum segments to areas** and associate the learned robot rooms with your HA areas.
 3. Use the native vacuum room controls or the `vacuum.clean_area` action. No custom dashboard resource is required.
 
 Example automation action (replace the entity and HA area IDs):
@@ -94,6 +94,6 @@ Diagnostics contain counts and operational flags only. They omit Tuya configurat
 
 ## Development and protocol references
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for isolated tests and [docs/PROTOCOL.md](docs/PROTOCOL.md) for the frame contract and evidence boundary. No automated test contacts a physical device.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for isolated tests, [docs/VALIDATION.md](docs/VALIDATION.md) for validation results, and [docs/PROTOCOL.md](docs/PROTOCOL.md) for the frame contract and evidence boundary. No automated test contacts a physical device.
 
 Project structure, development-container approach, issue templates, and validation workflow are based on [ludeeus/integration_blueprint](https://github.com/ludeeus/integration_blueprint), with its MIT attribution preserved. The protocol was independently implemented in Python from the supplied verified captures and the documented setter/report distinction in [LM1LC3N7/gladys-lubluelu-vaccum](https://github.com/LM1LC3N7/gladys-lubluelu-vaccum/blob/main/src/tuya/sweeper.js). Native area support follows [Home Assistant's vacuum API](https://developers.home-assistant.io/docs/core/entity/vacuum/).

@@ -43,8 +43,11 @@ class RoomCleaningFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 await self.async_set_unique_id(vacuum.id)
                 self._abort_if_unique_id_configured()
+                state = self.hass.states.get(vacuum.entity_id)
                 return self.async_create_entry(
-                    title=vacuum.name or vacuum.original_name or "Vacuum rooms",
+                    title=vacuum.name
+                    or vacuum.original_name
+                    or (state.name if state else "Vacuum rooms"),
                     data={CONF_VACUUM: vacuum.id, CONF_COMMAND: command.id},
                     options={CONF_ROOMS: {}, CONF_PROTOCOL: False, CONF_MAP: 0},
                 )

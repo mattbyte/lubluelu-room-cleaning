@@ -15,6 +15,7 @@ from custom_components.lubluelu_room_cleaning.const import (
 
 
 async def test_setup_and_duplicate(hass, sources):
+    hass.states.async_set(sources[0].entity_id, "docked", {"friendly_name": "Simulated SL60D"})
     data = {"vacuum": sources[0].entity_id, "command": sources[1].entity_id}
     with patch("custom_components.lubluelu_room_cleaning.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_init(
@@ -23,6 +24,7 @@ async def test_setup_and_duplicate(hass, sources):
         assert result["type"] == FlowResultType.FORM
         result = await hass.config_entries.flow.async_configure(result["flow_id"], data)
         assert result["type"] == FlowResultType.CREATE_ENTRY
+        assert result["title"] == "Simulated SL60D"
         assert not result["options"][CONF_PROTOCOL]
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}, data=data

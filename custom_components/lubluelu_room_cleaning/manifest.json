@@ -5,7 +5,7 @@
   "config_flow": true,
   "dependencies": ["text", "vacuum"],
   "documentation": "https://github.com/mattbyte/lubluelu-room-cleaning",
-  "integration_type": "helper",
+  "integration_type": "service",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/mattbyte/lubluelu-room-cleaning/issues",
   "requirements": [],
