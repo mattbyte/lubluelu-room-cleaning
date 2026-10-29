@@ -86,6 +86,8 @@ The companion forwards supported start, stop, pause, dock, locate, spot-clean, a
 
 **Command failed:** check the robot before retrying. A timeout or service error does not establish that the device rejected the write. This integration does not automatically retry physical commands.
 
+**Command text is unknown after a restart:** this means no current DP15 value has been reported. Room cleaning and passive learning can still use the enabled command entity when it is available. An explicitly `unavailable` or missing command entity still blocks room commands. The source vacuum must also have a known, available state. No prior room report or reconfiguration is required just to clear an `unknown` command value.
+
 **Too many rooms:** the text entity imposes a payload length limit. Select fewer rooms; the integration will not split one action into multiple commands.
 
 **Misleading activity:** activity is taken from Tuya Local, never the official Tuya cloud entity. If your Tuya Local definition does not handle `select_room`, correct its device definition upstream rather than relying on an optimistic status.

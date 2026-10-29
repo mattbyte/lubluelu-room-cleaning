@@ -1,4 +1,26 @@
-# Validation for 0.1.0
+# Validation
+
+## 0.1.1
+
+The new cleaning and learning regressions first reproduced the failures on the
+unmodified runtime: native area cleaning rejected an `unknown` command value,
+and passive learning returned `source_unavailable` immediately.
+
+The fix passes 64 tests on both Home Assistant 2026.10.0 and 2026.10.4 with 91%
+statement coverage. Ruff lint and formatting checks pass. Regression coverage includes:
+
+- Native `vacuum.clean_area` after reloading the companion while the command
+  text value is unknown, with exactly one transport write and no start command.
+- Passive learning from unknown, accepting only a fresh valid room report.
+- Missing, unavailable, disabled, removed, and separated source entities still
+  preventing room commands; an unknown vacuum state still prevents commands.
+- Payload limits and no automatic retries after service errors or timeouts,
+  including when the initial command value is unknown.
+
+All tests use simulated entities. No physical commands were sent and no live
+Home Assistant configuration was changed during this validation.
+
+## 0.1.0
 
 Automated tests use synthetic Tuya Local entity-registry entries and a mocked
 text transport. They never connect to Tuya or operate hardware.

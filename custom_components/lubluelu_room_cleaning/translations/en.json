@@ -49,7 +49,9 @@
   "entity": {"vacuum": {"room_cleaning": {"name": "Room cleaning"}}},
   "exceptions": {
     "learning_busy": {"message": "Room learning is active. Finish or cancel it before starting room cleaning."},
-    "source_unavailable": {"message": "The Tuya Local source entities are unavailable, disabled, or no longer on the same device. Check them or reconfigure this integration."},
+    "invalid_sources": {"message": "The configured Tuya Local source entities are missing, disabled, or no longer on the same device. Restore them or reconfigure this integration."},
+    "vacuum_unavailable": {"message": "The Tuya Local vacuum is unavailable or has no known state. Check its connection and wait for it to become available."},
+    "command_unavailable": {"message": "The Tuya Local command text entity is unavailable or has not loaded. Check its connection and wait for it to become available."},
     "payload_too_long": {"message": "The room command exceeds the command text entity's maximum length. Select fewer rooms."},
     "invalid_selection": {"message": "Select known rooms and confirm protocol compatibility. If the map changed, relearn rooms and update the native area mapping."},
     "command_failed": {"message": "Tuya Local could not confirm the service call. Check the robot before retrying; the command may already have been accepted."}
