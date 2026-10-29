@@ -7,4 +7,3 @@ CONF_ROOMS = "rooms"
 CONF_PROTOCOL = "protocol_confirmed"
 CONF_MAP = "map_revision"
 LEARN_TIMEOUT = 120
-UNAVAILABLE = {"unknown", "unavailable"}

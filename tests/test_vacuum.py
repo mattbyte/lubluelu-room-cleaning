@@ -17,7 +17,11 @@ def companion(hass, entry):
     return hass.data["vacuum"].get_entity(entity_id)
 
 
-async def test_native_area_dispatch(hass, loaded, sources, text_calls):
+@pytest.mark.parametrize("command_state", ["qgAEFQEBAxo=", "unknown"])
+async def test_native_area_dispatch(hass, loaded, sources, text_calls, command_state):
+    hass.states.async_set(sources[1].entity_id, command_state, {"max": 255})
+    assert await hass.config_entries.async_reload(loaded.entry_id)
+    await hass.async_block_till_done()
     entity = companion(hass, loaded)
     kitchen = ar.async_get(hass).async_create("Kitchen")
     corridor = ar.async_get(hass).async_create("Corridor")
@@ -71,6 +75,58 @@ async def test_unavailable_and_oversized(hass, loaded, sources, text_calls):
     hass.states.async_set(sources[1].entity_id, "qgAEFQEBAxo=", {"max": 4})
     with pytest.raises(ServiceValidationError):
         await entity.async_clean_segments(["0:3"])
+    assert not text_calls
+
+
+@pytest.mark.parametrize(
+    ("index", "source_state", "error_key"),
+    [
+        (0, "unknown", "vacuum_unavailable"),
+        (0, "unavailable", "vacuum_unavailable"),
+        (0, None, "vacuum_unavailable"),
+        (1, "unavailable", "command_unavailable"),
+        (1, None, "command_unavailable"),
+    ],
+)
+async def test_unusable_source_blocks_commands(
+    hass, loaded, sources, text_calls, index, source_state, error_key
+):
+    if source_state is None:
+        hass.states.async_remove(sources[index].entity_id)
+    else:
+        hass.states.async_set(sources[index].entity_id, source_state)
+    with pytest.raises(ServiceValidationError) as error:
+        await companion(hass, loaded).async_clean_segments(["0:3"])
+    assert error.value.translation_key == error_key
+    assert not text_calls
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("change", ["disabled", "removed", "moved"])
+async def test_invalid_sources_block_unknown_command(
+    hass, loaded, sources, text_calls, index, change
+):
+    hass.states.async_set(sources[1].entity_id, "unknown")
+    registry = er.async_get(hass)
+    entity_id = sources[index].entity_id
+    if change == "disabled":
+        registry.async_update_entity(entity_id, disabled_by=er.RegistryEntryDisabler.USER)
+    elif change == "removed":
+        registry.async_remove(entity_id)
+    else:
+        registry.async_update_entity(entity_id, device_id=None)
+    await hass.async_block_till_done()
+    with pytest.raises(ServiceValidationError) as error:
+        await companion(hass, loaded).async_clean_segments(["0:3"])
+    assert error.value.translation_key == "invalid_sources"
+    assert not text_calls
+
+
+async def test_unknown_command_still_enforces_payload_limit(hass, loaded, sources, text_calls):
+    hass.states.async_set(sources[1].entity_id, "unknown", {"max": 4})
+    with pytest.raises(ServiceValidationError) as error:
+        await companion(hass, loaded).async_clean_segments(["0:3"])
+    assert error.value.translation_key == "payload_too_long"
     assert not text_calls
 
 

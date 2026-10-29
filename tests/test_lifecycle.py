@@ -38,16 +38,20 @@ async def test_foreign_device_and_platform_rejected(hass, sources):
         source_pair(hass, sources[0].entity_id, wrong.entity_id)
 
 
-async def test_no_retry_on_transport_error(hass, loaded):
+@pytest.mark.parametrize("command_state", ["qgAEFQEBAxo=", "unknown"])
+@pytest.mark.parametrize("exception", [HomeAssistantError, TimeoutError])
+async def test_no_retry_on_transport_error(hass, loaded, sources, command_state, exception):
+    hass.states.async_set(sources[1].entity_id, command_state)
     calls = []
 
     async def fail(call):
         calls.append(call)
-        raise HomeAssistantError("synthetic failure")
+        raise exception("synthetic failure")
 
     hass.services.async_register("text", "set_value", fail)
-    with pytest.raises(ServiceValidationError):
+    with pytest.raises(ServiceValidationError) as error:
         await loaded.runtime_data.send("qgAEFAEBAxk=")
+    assert error.value.translation_key == "command_failed"
     assert len(calls) == 1
     assert not loaded.runtime_data.sending
 
