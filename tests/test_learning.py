@@ -38,6 +38,22 @@ async def test_timeout_cleanup(hass, loaded):
     assert loaded.runtime_data._learn_unsub is None
 
 
+async def test_learning_from_unknown_waits_for_fresh_report(hass, loaded, sources, text_calls):
+    hass.states.async_set(sources[1].entity_id, "unknown")
+    runtime = loaded.runtime_data
+    task = hass.async_create_background_task(runtime.learn(), "test learning from unknown")
+    await asyncio.sleep(0)
+    assert not task.done()
+    hass.states.async_set(sources[1].entity_id, "unknown", {"max": 255})
+    await hass.async_block_till_done()
+    assert not task.done()
+    hass.states.async_set(sources[1].entity_id, "qgAEFQEBAxo=")
+    assert await task == (3, None)
+    assert runtime.learning is None
+    assert runtime._learn_unsub is None
+    assert not text_calls
+
+
 async def test_unload_cancels_learning(hass, loaded):
     runtime = loaded.runtime_data
     task = hass.async_create_background_task(runtime.learn(), "test learning")

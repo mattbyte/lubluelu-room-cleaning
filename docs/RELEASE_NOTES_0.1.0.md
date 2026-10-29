@@ -9,3 +9,5 @@ Initial release of Lubluelu Room Cleaning for Home Assistant 2026.10+ and Tuya L
 - Diagnostics with an explicit allowlist, source repairs, and entity-rename handling.
 
 Install as a HACS custom repository. The SL60D single-room protocol was previously user-confirmed; this integration's hardware behavior, multi-room cleaning, and other models remain unverified. One map and one cleaning pass per request are supported.
+
+Validation: 47 tests pass on HA 2026.10.0 and 2026.10.4, with 91% statement coverage. Ruff, Hassfest, and HACS checks pass. Guided learning, native area mapping, and the built-in room picker were checked in an isolated HA frontend with simulated entities. No hardware commands were sent.

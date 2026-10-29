@@ -26,15 +26,15 @@
     "step": {
       "init": {"title": "Manage learned rooms", "menu_options": {"learn": "Learn a room from Smart Life", "manual": "Enter an ID or paste a report", "edit": "Rename a room", "delete": "Delete a room", "reset": "Reset after remapping"}},
       "learn": {"title": "Learn one room", "description": "Enter a room name. On the next screen, start that room alone in Smart Life. This will physically start the robot through Smart Life; this integration only listens. You control stopping or docking it. A report already present before listening is not accepted.", "data": {"name": "Room name"}},
-      "listen": {"title": "Waiting for {name}", "description": "Now start only {name} in Smart Life. Waiting up to two minutes for a changed single-room report. If the report stays identical, cancel and use manual entry. The integration sends no commands."},
+      "listen": {"title": "Waiting for a room report"},
       "learn_failed": {"title": "No room saved", "description": "{reason} You can try again or paste a known report. Repeated cached reports cannot prove a new selection.", "menu_options": {"learn": "Try learning again", "manual": "Enter an ID or paste a report"}},
       "manual": {"title": "Add a known room", "description": "Enter a decimal room ID (0–255) or paste a single-room 0x15 base64 report. A numeric ID requires explicit protocol confirmation. IDs are specific to the current robot map; never copy another user's assignments. No command is sent.", "data": {"name": "Room name", "room_or_report": "Room ID or report", "confirm_protocol": "I have verified this device uses the Tuya sweeper 0x14/0x15 room protocol"}},
-      "confirm": {"title": "Confirm room ID {room}", "description": "Save a name for room ID {room}. Existing name: {previous}. Saving replaces the name if this ID already exists. This does not test cleaning. Then map the learned room to a Home Assistant area in the companion vacuum's entity settings.", "data": {"name": "Room name"}},
+      "confirm": {"title": "Confirm learned room", "description": "Save a name for room ID {room}. Existing name: {previous}. Saving replaces the name if this ID already exists. This does not test cleaning. Then map the learned room to a Home Assistant area in the companion vacuum's entity settings.", "data": {"name": "Room name"}},
       "edit": {"title": "Choose a room to rename", "data": {"room": "Room"}},
       "delete": {"title": "Delete a learned room", "description": "Submitting removes this room. Update the companion vacuum's area mapping afterward.", "data": {"room": "Room"}},
       "reset": {"title": "Reset the learned map?", "description": "Submitting removes ALL learned rooms and invalidates old area mappings. Do this whenever Smart Life changes the map or room numbering. Relearn rooms and map them to HA areas again before cleaning."}
     },
-    "progress": {"listen": "Listening for a new single-room selection report"},
+    "progress": {"listen": "Now start only {name} in Smart Life. Waiting up to two minutes for a changed single-room report. If the report stays identical, cancel and use manual entry. The integration sends no commands."},
     "error": {
       "invalid_name": "Enter a nonempty room name.",
       "duplicate_name": "Another room already uses this name.",
@@ -49,7 +49,9 @@
   "entity": {"vacuum": {"room_cleaning": {"name": "Room cleaning"}}},
   "exceptions": {
     "learning_busy": {"message": "Room learning is active. Finish or cancel it before starting room cleaning."},
-    "source_unavailable": {"message": "The Tuya Local source entities are unavailable, disabled, or no longer on the same device. Check them or reconfigure this integration."},
+    "invalid_sources": {"message": "The configured Tuya Local source entities are missing, disabled, or no longer on the same device. Restore them or reconfigure this integration."},
+    "vacuum_unavailable": {"message": "The Tuya Local vacuum is unavailable or has no known state. Check its connection and wait for it to become available."},
+    "command_unavailable": {"message": "The Tuya Local command text entity is unavailable or has not loaded. Check its connection and wait for it to become available."},
     "payload_too_long": {"message": "The room command exceeds the command text entity's maximum length. Select fewer rooms."},
     "invalid_selection": {"message": "Select known rooms and confirm protocol compatibility. If the map changed, relearn rooms and update the native area mapping."},
     "command_failed": {"message": "Tuya Local could not confirm the service call. Check the robot before retrying; the command may already have been accepted."}
