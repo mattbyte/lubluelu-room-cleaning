@@ -4,13 +4,14 @@ import asyncio
 from collections.abc import Callable
 from typing import Any
 
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import CONF_COMMAND, CONF_VACUUM, DOMAIN, LEARN_TIMEOUT, UNAVAILABLE
+from .const import CONF_COMMAND, CONF_VACUUM, DOMAIN, LEARN_TIMEOUT
 from .protocol import InvalidReport, single_room
 
 
@@ -75,10 +76,16 @@ class Runtime:
         return True
 
     def state(self, index: int):
-        """Return a usable source state."""
+        """Return a usable state, allowing an unreported command text value."""
         entity = self.sources()[index]
         state = self.hass.states.get(entity.entity_id) if entity else None
-        return state if state and state.state not in UNAVAILABLE else None
+        if state is None or state.state == STATE_UNAVAILABLE:
+            return None
+        # DP15 may not be reported after reconnecting until a room report arrives.
+        # An unknown current text value does not prevent writing a new command.
+        if index == 0 and state.state == STATE_UNKNOWN:
+            return None
+        return state
 
     @callback
     def start(self) -> None:
@@ -186,9 +193,13 @@ class Runtime:
         """Send a single command; never retry a potentially accepted write."""
         if self.learning is not None:
             raise service_error("learning_busy")
-        if not self.valid_sources() or not self.state(0) or not self.state(1):
-            raise service_error("source_unavailable")
+        if not self.valid_sources():
+            raise service_error("invalid_sources")
+        if not self.state(0):
+            raise service_error("vacuum_unavailable")
         state = self.state(1)
+        if state is None:
+            raise service_error("command_unavailable")
         if len(payload) > state.attributes.get("max", 255):
             raise service_error("payload_too_long")
         self.sending = True
@@ -204,8 +215,10 @@ class Runtime:
 
     async def forward(self, service: str, data: dict[str, Any], context=None):
         """Forward a normal vacuum control through its existing HA service."""
-        if not self.valid_sources() or not self.state(0):
-            raise service_error("source_unavailable")
+        if not self.valid_sources():
+            raise service_error("invalid_sources")
+        if not self.state(0):
+            raise service_error("vacuum_unavailable")
         await self._call(
             "vacuum",
             service,
